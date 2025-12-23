@@ -106,8 +106,7 @@ function isConfigured() {
   return ok;
 }
 
-const supabaseClient = isConfigured()
-  ? window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY)
+const supabaseClient = isConfigured() ? window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY)
   : null;
 
 const state = {
