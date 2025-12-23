@@ -1,0 +1,88 @@
+Beat The Intro — Multiplayer (Supabase Realtime)
+=================================================
+
+What this gives you
+- One HOST device runs the game on the TV
+- Everyone else JOINS on their own phones
+- Shared room code, shared scores, shared current track/reveal state
+- Buzz-in button (first buzz wins)
+
+Important note (simplicity over security)
+This is for family/personal use. The included SQL disables Row Level Security (RLS) on the game table
+so that anyone with your Pages URL can read/write game rooms.
+If you want it locked down, ask me and I'll produce an RLS version with room tokens.
+
+1) Create Supabase project
+- Go to Supabase, create a new project.
+
+2) Create the table (SQL editor)
+Run this SQL:
+
+-- Multiplayer room state
+create table if not exists public.bti_rooms (
+  code text primary key,
+  state jsonb not null,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create or replace function public.set_updated_at()
+returns trigger as $$
+begin
+  new.updated_at = now();
+  return new;
+end;
+$$ language plpgsql;
+
+drop trigger if exists trg_bti_rooms_updated on public.bti_rooms;
+create trigger trg_bti_rooms_updated
+before update on public.bti_rooms
+for each row
+execute function public.set_updated_at();
+
+-- For personal use simplicity:
+alter table public.bti_rooms disable row level security;
+
+3) Enable Realtime on the table
+- Supabase Dashboard → Realtime (or Database → Replication)
+- Ensure "bti_rooms" is enabled for realtime broadcasts
+
+4) Put your keys into config.js
+- Supabase Dashboard → Settings → API
+- Copy:
+  - Project URL
+  - anon public key
+- Paste into config.js
+
+5) Host on GitHub Pages
+- Upload all files to a GitHub repo
+- Settings → Pages → Deploy from branch → main / (root)
+
+6) Add your music clips
+- Put intro clips in: assets/tracks/
+- Use filenames in: song_filenames.txt
+
+How to play
+- Open the site on the TV/host device → choose HOST → configure → Create Room
+- Everyone else opens the same site → choose JOIN → enter room code → pick name + team → BUZZ
+
+Troubleshooting
+- If players can't see updates: confirm Realtime is enabled for bti_rooms
+- If audio doesn't route to TV when casting: use HDMI laptop or connect a Bluetooth speaker to host phone
+
+
+Full tracks + escalating clips
+- You can use full-length MP3s.
+- Host plays only a clip (e.g. 3s), then taps “More time” to increase (e.g. +2s) up to the max.
+- If needed, host can tap “Play Full Track” for the big reveal.
+
+
+Clue penalty (optional)
+- In Host Setup you can enable a penalty so each extra clip reduces the points you can award.
+
+
+Team name generator + roster
+- Host can auto-generate cheeky team names (no slurs).
+- Players enter their own name when joining; host sees names under each team on the scoreboard.
+
+- Generator now supports 2–6 teams and Mild/Spicy/Nuclear levels.

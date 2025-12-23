@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Beat The Intro — Multiplayer</title>
+  <link rel="stylesheet" href="styles.css" />
+  <meta name="theme-color" content="#111827" />
+</head>
+<body>
+  <div id="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo">🎧</div>
+        <div>
+          <div class="title">Beat The Intro</div>
+          <div class="subtitle">Multiplayer • Host + Join</div>
+        </div>
+      </div>
+      <div class="topActions">
+        <button id="btnFullscreen" class="btn ghost">Fullscreen</button>
+        <button id="btnHelp" class="btn ghost">Help</button>
+      </div>
+    </header>
+
+    <main class="main">
+      <section class="card" id="landingCard">
+        <h2>Pick your mode</h2>
+        <div class="modeGrid">
+          <button class="modeBtn" id="goHost">
+            <div class="modeTitle">HOST</div>
+            <div class="modeDesc">Run the game on the TV</div>
+          </button>
+          <button class="modeBtn" id="goJoin">
+            <div class="modeTitle">JOIN</div>
+            <div class="modeDesc">Buzz in from your phone</div>
+          </button>
+        </div>
+        <div class="smallprint">
+          <div>✅ Works great mirrored/cast from the host device.</div>
+          <div>🎵 Add your own intro clips in <code>assets/tracks/</code> using <code>song_filenames.txt</code>.</div>
+        </div>
+      </section>
+
+      <section class="card hidden" id="hostSetupCard">
+        <h2>Host Setup</h2>
+
+        <div class="row">
+          <label>Teams (comma separated)</label>
+          <input id="teamsInput" type="text" value="Mum, Dad, Kids" />
+          <div class="hint">Tip: keep it to 2–4 teams. Players pick a team when joining.</div>
+          <div class="row" style="margin-top:10px">
+            <label style="margin-bottom:8px; display:block;">Generator options</label>
+            <div class="segmented" id="teamCountSelector" style="margin-bottom:10px">
+              <button data-teamcount="2" class="active">2 teams</button>
+              <button data-teamcount="3">3 teams</button>
+              <button data-teamcount="4">4 teams</button>
+              <button data-teamcount="5">5 teams</button>
+              <button data-teamcount="6">6 teams</button>
+            </div>
+            <div class="segmented" id="spiceSelector">
+              <button data-spice="mild">Mild</button>
+              <button data-spice="spicy" class="active">Spicy</button>
+              <button data-spice="nuclear">Nuclear</button>
+            </div>
+            <div class="hint">Spicy is rude/funny. Nuclear is *very* rude (still no slurs or protected-class punches).</div>
+          </div>
+          <div class="actions" style="justify-content:flex-start; gap:10px; flex-wrap:wrap;">
+            <button id="btnGenTeams" class="btn">🎲 Generate team names</button>
+            <button id="btnGenTeamsClean" class="btn ghost">Make it cleaner</button>
+          </div>
+        </div>
+
+        <div class="row">
+          <label>Round pack</label>
+          <select id="roundSelect"></select>
+        </div>
+
+        <div class="row">
+          <label>Intro length</label>
+          <div class="segmented" id="lengthSelector">
+            <button data-len="2">2s</button>
+            <button data-len="3" class="active">3s</button>
+            <button data-len="5">5s</button>
+            <button data-len="10">10s</button>
+          </div>
+        </div>
+
+        
+        <div class="row">
+          <label>Escalation</label>
+          <div class="segmented" id="stepSelector">
+            <button data-step="1">+1s</button>
+            <button data-step="2" class="active">+2s</button>
+            <button data-step="3">+3s</button>
+          </div>
+          <div class="hint">If nobody gets it, tap “More time” to increase the clip.</div>
+        </div>
+
+        <div class="row">
+          <label>Maximum clip length</label>
+          <div class="segmented" id="maxSelector">
+            <button data-max="10" class="active">10s</button>
+            <button data-max="15">15s</button>
+            <button data-max="30">30s</button>
+          </div>
+          <div class="hint">After max, you can still hit “Play Full Track”.</div>
+        </div>
+
+        <div class="row">
+          <label>Clue penalty</label>
+          <div class="segmented" id="penaltySelector">
+            <button data-penalty="off" class="active">Off</button>
+            <button data-penalty="minus1">-1 point each extra clip</button>
+            <button data-penalty="half">Half points after first clip</button>
+          </div>
+          <div class="hint">Applies when you award the buzz winner. Manual +/- still works.</div>
+        </div>
+
+<div class="row">
+          <label>Scoring</label>
+          <div class="segmented" id="scoringSelector">
+            <button data-mode="any" class="active">Artist or song (1pt)</button>
+            <button data-mode="both">Artist + song (2pt)</button>
+          </div>
+        </div>
+
+        <div class="row">
+          <label>Question count</label>
+          <div class="segmented" id="countSelector">
+            <button data-count="10">10</button>
+            <button data-count="20" class="active">20</button>
+            <button data-count="30">30</button>
+            <button data-count="40">40</button>
+          </div>
+        </div>
+
+        <div class="actions split">
+          <button id="backToLanding1" class="btn ghost">← Back</button>
+          <button id="btnCreateRoom" class="btn primary">Create Room</button>
+        </div>
+
+        <p class="hint">You’ll get a room code to share. Players join from the same URL.</p>
+      </section>
+
+      <section class="card hidden" id="joinCard">
+        <h2>Join Game</h2>
+
+        <div class="row">
+          <label>Room code</label>
+          <input id="roomCodeInput" type="text" placeholder="e.g. J4K9Q" />
+        </div>
+
+        <div class="row">
+          <label>Your name</label>
+          <input id="playerNameInput" type="text" placeholder="e.g. Mike" />
+        </div>
+
+        <div class="row">
+          <label>Team</label>
+          <select id="teamSelect"></select>
+          <div class="hint">If teams change, you can re-join and pick again.</div>
+        </div>
+
+        <div class="actions split">
+          <button id="backToLanding2" class="btn ghost">← Back</button>
+          <button id="btnJoinRoom" class="btn primary">Join</button>
+        </div>
+      </section>
+
+      <section class="card hidden" id="hostGameCard">
+        <div class="gameHeader">
+          <div>
+            <div class="kicker" id="packName">Round Pack</div>
+            <h2 id="roundTitle">Get Ready</h2>
+          </div>
+          <div class="pillGroup">
+            <div class="pill" id="roomPill">Room: —</div>
+            <div class="pill" id="trackCounter">0 / 0</div>
+            <div class="pill subtle" id="nowPlaying">—</div>
+            <div class="pill" id="clipPill">Clip: —</div>
+            <div class="pill" id="pointsPill">Points: —</div>
+          </div>
+          <div class="qrMini">
+            <div id="qrJoin" class="qrBox"></div>
+            <div class="qrText muted">Scan to join</div>
+          </div>
+        </div>
+
+        <div class="stage">
+          <div class="prompt" id="prompt">Waiting…</div>
+
+          <div class="controls">
+            <button id="btnPlay" class="btn primary">▶ Play Clip</button>
+            <button id="btnMoreTime" class="btn">⏩ More time</button>
+            <button id="btnFull" class="btn">💿 Play Full Track</button>
+            <button id="btnStop" class="btn">⏹ Stop</button>
+            <button id="btnReveal" class="btn">👀 Reveal</button>
+          </div>
+
+          <div class="answer hidden" id="answerBox">
+            <div class="answerLine"><span class="muted">Artist:</span> <span id="ansArtist">—</span></div>
+            <div class="answerLine"><span class="muted">Song:</span> <span id="ansSong">—</span></div>
+            <div class="badges">
+              <span class="badge" id="badgeDecade">—</span>
+              <span class="badge" id="badgeCat">—</span>
+            </div>
+          </div>
+
+          <div class="timerRow">
+            <div class="barWrap"><div class="bar" id="bar"></div></div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="buzzBox">
+            <div class="buzzTitle">Buzz-in</div>
+            <div class="buzzStatus" id="buzzStatus">No buzz yet.</div>
+            <div class="actions split">
+              <button id="btnClearBuzz" class="btn ghost">Clear Buzz</button>
+              <button id="btnAwardBuzz" class="btn primary">Award Point to Buzz Winner</button>
+            </div>
+            <div class="hint">Host adjudicates. Clear buzz between questions.</div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="teamsHeader">
+            <h3>Scoreboard</h3>
+            <div class="tiny muted" id="rosterHint">Players appear under their team when they join</div>
+          </div>
+          <div class="teams" id="teams"></div>
+
+          <div class="actions split">
+            <button id="btnNext" class="btn">Next Track ➜</button>
+            <button id="btnEnd" class="btn ghost">End & Show Winner</button>
+          </div>
+
+          <div class="actions split">
+            <button id="btnReset" class="btn danger">Hard Reset</button>
+            <button id="btnCopyJoin" class="btn ghost">Copy Join Info</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="card hidden" id="playerCard">
+        <div class="gameHeader">
+          <div>
+            <div class="kicker">Joined room</div>
+            <h2 id="playerRoomTitle">—</h2>
+          </div>
+          <div class="pillGroup">
+            <div class="pill" id="playerTrackCounter">0 / 0</div>
+            <div class="pill subtle" id="playerNowPlaying">—</div>
+          </div>
+          <div class="qrMini">
+            <div id="qrJoin" class="qrBox"></div>
+            <div class="qrText muted">Scan to join</div>
+          </div>
+        </div>
+
+        <div class="stage">
+          <div class="prompt" id="playerPrompt">Waiting for host…</div>
+
+          <div class="buzzerWrap">
+            <button id="btnBuzz" class="buzzer">BUZZ</button>
+            <div class="buzzHint" id="playerBuzzHint">First buzz wins.</div>
+          </div>
+
+          <div class="answer hidden" id="playerAnswerBox">
+            <div class="answerLine"><span class="muted">Artist:</span> <span id="pAnsArtist">—</span></div>
+            <div class="answerLine"><span class="muted">Song:</span> <span id="pAnsSong">—</span></div>
+          </div>
+
+          <div class="timerRow">
+            <div class="barWrap"><div class="bar" id="playerBar"></div></div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="teamsHeader">
+            <h3>Scores</h3>
+          </div>
+          <div class="teams" id="playerTeams"></div>
+
+          <div class="actions split">
+            <button id="btnLeave" class="btn ghost">Leave Room</button>
+            <button id="btnScoresOverlay" class="btn">📊 Scoreboard</button>
+            <button id="btnRefreshTeam" class="btn ghost">Refresh Teams</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="card hidden" id="winnerCard">
+        <h2>🏆 Winner</h2>
+        <div class="winnerName" id="winnerName">—</div>
+        <div class="winnerScores" id="winnerScores"></div>
+        <div class="actions split">
+          <button id="btnPlayAgain" class="btn primary">Play Again</button>
+          <button id="btnWinnerLeave" class="btn ghost">Back to start</button>
+        </div>
+      </section>
+    </main>
+
+    <div class="modal hidden" id="helpModal">
+      <div class="modalInner">
+        <div class="modalHeader">
+          <div class="modalTitle">How this works</div>
+          <button id="btnCloseHelp" class="btn ghost">Close</button>
+        </div>
+        <div class="modalBody">
+          <ol>
+            <li>Host creates a room and connects to the TV.</li>
+            <li>Everyone else joins with the room code.</li>
+            <li>Host plays intros; players buzz on their phones.</li>
+            <li>Host awards points and moves to next track.</li>
+          </ol>
+          <p class="muted">Setup required: Supabase URL + anon key in <code>config.js</code> and enable realtime for <code>bti_rooms</code>.</p>
+        </div>
+      </div>
+    
+    <div class="modal hidden" id="scoresModal">
+      <div class="modalInner">
+        <div class="modalHeader">
+          <div class="modalTitle">Scoreboard</div>
+          <button id="btnCloseScores" class="btn ghost">Close</button>
+        </div>
+        <div class="modalBody">
+          <div class="scoreOverlayMeta muted" id="scoreOverlayMeta">—</div>
+          <div class="winnerScores" id="scoresOverlayList"></div>
+        </div>
+      </div>
+    </div>
+
+</div>
+
+    <footer class="footer">
+      <span class="muted">Personal use • Supabase Realtime • No repeats per session</span>
+    </footer>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
