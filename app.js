@@ -1,8 +1,4 @@
-const supabase =
-  supabase.createClient(
-    window.SUPABASE_URL,
-    window.SUPABASE_ANON_KEY
-);
+
 
 function generateTeamNames(count, mode="spicy", spice="spicy"){
   // "Spicy" / "Nuclear" are cheeky rude (no slurs, no hate, no protected-class punching).
@@ -369,23 +365,23 @@ function defaultRoomState({ teams, packId, baseClipSeconds, stepSeconds, maxClip
 // ===== Supabase helpers =====
 function cleanupRealtime() {
   if (state.channel) {
-    try { supabase.removeChannel(state.channel); } catch {}
+    try { supabaseClient.removeChannel(state.channel); } catch {}
     state.channel = null;
   }
 }
 async function getRoom(code) {
-  const { data, error } = await supabase.from("bti_rooms").select("*").eq("code", code).maybeSingle();
+  const { data, error } = await supabaseClient.from("bti_rooms").select("*").eq("code", code).maybeSingle();
   if (error) throw error;
   return data;
 }
 async function updateRoomState(code, newState) {
   state.roomState = newState;
-  const { error } = await supabase.from("bti_rooms").update({ state: newState }).eq("code", code);
+  const { error } = await supabaseClient.from("bti_rooms").update({ state: newState }).eq("code", code);
   if (error) alert("Update failed: " + error.message);
 }
 async function joinRealtime(code) {
   cleanupRealtime();
-  state.channel = supabase.channel("bti_room_" + code);
+  state.channel = supabaseClient.channel("bti_room_" + code);
   state.channel.on(
     "postgres_changes",
     { event: "*", schema: "public", table: "bti_rooms", filter: `code=eq.${code}` },
@@ -524,7 +520,7 @@ if (btnGenTeamsClean) btnGenTeamsClean.addEventListener("click", () => {
 });
 
 
-  const { error } = await supabase.from("bti_rooms").insert({ code, state: rs });
+  const { error } = await supabaseClient.from("bti_rooms").insert({ code, state: rs });
   if (error) {
     alert("Couldn't create room. Check SUPABASE_SETUP.txt\n\n" + error.message);
     return;
