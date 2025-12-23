@@ -1,4 +1,8 @@
-
+const supabase =
+  supabase.createClient(
+    window.SUPABASE_URL,
+    window.SUPABASE_ANON_KEY
+);
 
 function generateTeamNames(count, mode="spicy", spice="spicy"){
   // "Spicy" / "Nuclear" are cheeky rude (no slurs, no hate, no protected-class punching).
