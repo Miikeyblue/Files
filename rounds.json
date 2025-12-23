@@ -1,0 +1,5 @@
+[
+  { "round": 1, "name": "70s & 80s Classics", "songIds": [1, 4, 6, 8] },
+  { "round": 2, "name": "90s & 00s Anthems", "songIds": [3, 5, 7] },
+  { "round": 3, "name": "Modern Hits", "songIds": [9, 10] }
+]
